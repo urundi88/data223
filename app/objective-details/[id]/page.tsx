@@ -527,7 +527,7 @@ export default function ObjectiveDetailsPage() {
                       )}
 
                       <div className="space-y-3">
-                        {phase.subObjectives.map((subObj: any) => (
+                        {phase.subObjectives.map((subObj, subIndex) => (
                           <div key={subObj.id} className="bg-muted/30 rounded p-3 space-y-2">
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
@@ -541,64 +541,57 @@ export default function ObjectiveDetailsPage() {
                               </div>
                             </div>
 
-                            {/* Estatísticas Detalhadas */}
-                            <div className="bg-white/50 rounded p-3 space-y-2">
-                              <div className="flex items-center justify-between text-sm">
+                            {/* Detailed Stats - Fixed to show individual sub-objective target values */}
+                            <div className="bg-white/50 rounded p-2 space-y-1">
+                              <div className="flex items-center justify-between text-xs">
                                 <span className="text-purple-600">🎯 Atual:</span>
                                 <span className="font-medium">{subObj.currentValue}</span>
                                 <span className="text-blue-600">🎯 Meta:</span>
                                 <span className="font-medium">{subObj.targetValue}</span>
                                 <span className="text-orange-600">➡️ Restante:</span>
-                                <span className="font-medium">{subObj.targetValue - subObj.currentValue}</span>
+                                <span className="font-medium">
+                                  {Math.max(0, subObj.targetValue - subObj.currentValue)}
+                                </span>
                                 <span className="text-green-600">⚡ XP:</span>
                                 <span className="font-medium">{subObj.xpReward?.perPoint || 0}/pt</span>
                               </div>
-
-                              <div className="space-y-1">
-                                <div className="flex justify-between text-xs">
-                                  <span>Progresso do Subobjetivo</span>
-                                  <span>{Math.round((subObj.currentValue / subObj.targetValue) * 100)}%</span>
-                                </div>
-                                <Progress value={(subObj.currentValue / subObj.targetValue) * 100} className="h-1" />
-                              </div>
+                              <Progress value={(subObj.currentValue / subObj.targetValue) * 100} className="h-1" />
                             </div>
 
-                            {/* Controles de Pontos */}
-                            <div className="flex items-center justify-center gap-3 bg-gray-50 rounded-lg p-3">
+                            {/* Point Controls - Fixed to use individual sub-objective target values */}
+                            <div className="flex items-center justify-center gap-2 bg-gray-50 rounded p-2">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleSubObjectivePointChange(phase.id, subObj.id, -1)}
                                 disabled={subObj.currentValue <= 0}
                               >
-                                <Minus className="h-4 w-4" />
+                                <Minus className="h-3 w-3" />
                               </Button>
-
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
                                 <Input
                                   type="number"
                                   min="0"
                                   max={subObj.targetValue}
                                   value={subObj.currentValue}
-                                  onChange={(e) =>
-                                    handleSubObjectiveValueSet(
-                                      phase.id,
-                                      subObj.id,
-                                      Number.parseInt(e.target.value) || 0,
+                                  onChange={(e) => {
+                                    const newValue = Math.max(
+                                      0,
+                                      Math.min(Number.parseInt(e.target.value) || 0, subObj.targetValue),
                                     )
-                                  }
-                                  className="w-20 text-center"
+                                    updateSubObjective(objectiveId, phase.id, subObj.id, newValue)
+                                  }}
+                                  className="w-16 text-center text-xs"
                                 />
-                                <span className="text-sm text-muted-foreground">/ {subObj.targetValue}</span>
+                                <span className="text-xs text-muted-foreground">/{subObj.targetValue}</span>
                               </div>
-
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleSubObjectivePointChange(phase.id, subObj.id, 1)}
                                 disabled={subObj.currentValue >= subObj.targetValue}
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-3 w-3" />
                               </Button>
                             </div>
 
@@ -639,8 +632,8 @@ export default function ObjectiveDetailsPage() {
                               (subObj.goldReward?.perPoint || 0) > 0) && (
                               <div className="text-xs text-blue-600 bg-blue-50 rounded p-2">
                                 <strong>Recompensas:</strong>
-                                {subObj.xpReward?.perCompletion ||
-                                  (0 > 0 && ` ${subObj.xpReward.perCompletion} XP/conclusão`)}
+                                {(subObj.xpReward?.perCompletion || 0) > 0 &&
+                                  ` ${subObj.xpReward.perCompletion} XP/conclusão`}
                                 {(subObj.xpReward?.perPoint || 0) > 0 && ` ${subObj.xpReward.perPoint} XP/ponto`}
                                 {(subObj.goldReward?.perCompletion || 0) > 0 &&
                                   ` ${subObj.goldReward.perCompletion} Ouro/conclusão`}

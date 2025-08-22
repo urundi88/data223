@@ -235,11 +235,8 @@ export function ObjectivesProvider({ children }: { children: ReactNode }) {
       isRepeatable: phase.isRepeatable || false,
       isInfiniteLoop: phase.isInfiniteLoop || false,
       currentRepetitions: phase.currentRepetitions || 0,
-      targetValue: phase.targetValue || 100, // Valor padrão para a fase
       subObjectives: (phase.subObjectives || []).map((sub) => ({
         ...sub,
-        targetValue: sub.targetValue || 100, // Preservar o targetValue individual do subobjetivo
-        currentValue: sub.currentValue || 0,
         xpReward: sub.xpReward || { perCompletion: 0, perPoint: 0 },
         goldReward: sub.goldReward || { perCompletion: 0, perPoint: 0 },
         totalGoldEarned: sub.totalGoldEarned || 0,
