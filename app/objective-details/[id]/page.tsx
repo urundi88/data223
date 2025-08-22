@@ -527,7 +527,7 @@ export default function ObjectiveDetailsPage() {
                       )}
 
                       <div className="space-y-3">
-                        {phase.subObjectives.map((subObj, subIndex) => (
+                        {phase.subObjectives.map((subObj: any) => (
                           <div key={subObj.id} className="bg-muted/30 rounded p-3 space-y-2">
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
@@ -541,7 +541,7 @@ export default function ObjectiveDetailsPage() {
                               </div>
                             </div>
 
-                            {/* Detailed Stats - Fixed to show individual sub-objective target values */}
+                            {/* Detailed Stats */}
                             <div className="bg-white/50 rounded p-2 space-y-1">
                               <div className="flex items-center justify-between text-xs">
                                 <span className="text-purple-600">🎯 Atual:</span>
@@ -549,21 +549,19 @@ export default function ObjectiveDetailsPage() {
                                 <span className="text-blue-600">🎯 Meta:</span>
                                 <span className="font-medium">{subObj.targetValue}</span>
                                 <span className="text-orange-600">➡️ Restante:</span>
-                                <span className="font-medium">
-                                  {Math.max(0, subObj.targetValue - subObj.currentValue)}
-                                </span>
+                                <span className="font-medium">{subObj.targetValue - subObj.currentValue}</span>
                                 <span className="text-green-600">⚡ XP:</span>
                                 <span className="font-medium">{subObj.xpReward?.perPoint || 0}/pt</span>
                               </div>
                               <Progress value={(subObj.currentValue / subObj.targetValue) * 100} className="h-1" />
                             </div>
 
-                            {/* Point Controls - Fixed to use individual sub-objective target values */}
+                            {/* Point Controls */}
                             <div className="flex items-center justify-center gap-2 bg-gray-50 rounded p-2">
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleSubObjectivePointChange(phase.id, subObj.id, -1)}
+                                onClick={() => handleSubObjectivePointChange(objective.id, phase.id, subObj.id, -1)}
                                 disabled={subObj.currentValue <= 0}
                               >
                                 <Minus className="h-3 w-3" />
@@ -579,7 +577,7 @@ export default function ObjectiveDetailsPage() {
                                       0,
                                       Math.min(Number.parseInt(e.target.value) || 0, subObj.targetValue),
                                     )
-                                    updateSubObjective(objectiveId, phase.id, subObj.id, newValue)
+                                    updateSubObjective(objective.id, phase.id, subObj.id, newValue)
                                   }}
                                   className="w-16 text-center text-xs"
                                 />
@@ -588,7 +586,7 @@ export default function ObjectiveDetailsPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleSubObjectivePointChange(phase.id, subObj.id, 1)}
+                                onClick={() => handleSubObjectivePointChange(objective.id, phase.id, subObj.id, 1)}
                                 disabled={subObj.currentValue >= subObj.targetValue}
                               >
                                 <Plus className="h-3 w-3" />
@@ -632,8 +630,8 @@ export default function ObjectiveDetailsPage() {
                               (subObj.goldReward?.perPoint || 0) > 0) && (
                               <div className="text-xs text-blue-600 bg-blue-50 rounded p-2">
                                 <strong>Recompensas:</strong>
-                                {(subObj.xpReward?.perCompletion || 0) > 0 &&
-                                  ` ${subObj.xpReward.perCompletion} XP/conclusão`}
+                                {subObj.xpReward?.perCompletion ||
+                                  (0 > 0 && ` ${subObj.xpReward.perCompletion} XP/conclusão`)}
                                 {(subObj.xpReward?.perPoint || 0) > 0 && ` ${subObj.xpReward.perPoint} XP/ponto`}
                                 {(subObj.goldReward?.perCompletion || 0) > 0 &&
                                   ` ${subObj.goldReward.perCompletion} Ouro/conclusão`}
